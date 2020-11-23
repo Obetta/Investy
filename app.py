@@ -12,18 +12,6 @@ USER_ID = ""
 CURR_STOCK = ""
 USER_NAME = ""
 
-# @app.route('/',methods=['GET','POST']) # decorator: provides additional functionality to an existing function
-
-# def rootpage():
-#     if request.method == 'POST' and 'email' in request.form:
-#         fname = "'" + request.form.get('fname') + "'"
-#         lname = "'" + request.form.get('lname') + "'"
-#         phone_number = "'" + request.form.get('phone_number') + "'"
-#         email = "'" + request.form.get('email') + "'"
-#         mysqlconnector.createNewUser(fname, lname, phone_number, email)
-#     return render_template("signup.html")
-#     # need to ad logic for checking if user already exists
-
 @app.route('/')
 def homepage():
     return render_template("home.html")
