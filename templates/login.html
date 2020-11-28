@@ -11,10 +11,9 @@
   
   <body>
         <div class="main">
-            <h1>Login</h1>
+            <h1>Investy</h1>
+            <h3>Login</h3>
             <br>
-            <p>Please input your user information.</p>
-        
             <form class="pure-form" action="/login" method="POST">
                 <div class="form-group">
                     <label>Email address</label>
@@ -23,19 +22,26 @@
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input placeholder="Password" type="text" name="password" class="form-control">
+                    <input placeholder="Password" type="password" name="password" class="form-control">
                 </div>
 
-                <button type="submit" class="btn btn-primary" value="Login">Submit</button>            
+                <button type="submit" class="btn btn-primary" name="submit-post" value="Login">Login</button>
             </form>
 
             <div>
-                {% if error_info == 1 %}
+                <hr>
+                <small>or if you don't have an exisiting account</small>
+                <hr>
+                <a href="/signup"><button class="btn btn-primary">Signup</button></a>
+            </div>
+
+            <!-- <div>
+                {% if ERROR_INFO == 'invalid' %}
                     <p>Wrong username or password</p>
                     <br>
-                    <a href="/signup" class="btn btn-info" role="button">Signup</a>
+                    <a href="/signup" class="btn btn-info" role="button">or Signup</a>
                 {% endif %}
-            </div>
+            </div> -->
 
         </div>
 

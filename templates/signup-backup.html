@@ -14,7 +14,7 @@
     <div class="main">
         <p>Please input your user information.</p>
     
-        <form class="pure-form" action="/signup" method="POST">
+        <!-- <form class="pure-form" action="/signup" method="POST">
             Firstname: <br>
             <input type="text" name="fname" placeholder="first name"><br>
             <br>
@@ -37,11 +37,11 @@
 
             <button type="submit" class="btn btn-primary" value="Submit">Submit</button>
             <br>
-        </form>
+        </form> -->
         <small class="mini" id="emailHelp" class="form-text text-muted">-- Or if you already have an account -- </small>
         <br>
 
-        <a href="/login" class="btn btn-info" role="button">Login</a>
+        <!-- <a href="/login" class="btn btn-info" role="button">Login</a> -->
     </div>
 
     <div>
@@ -51,46 +51,3 @@
         {% endif %}
     </div>
 </body>
-
-@app.route('/signup',methods=['POST','GET'])
-def signup():
-    # info = 0
-
-    fname = str(request.form.get('fname'))
-    fname = "'" + fname + "'"
-    lname = str(request.form.get('lname'))
-    lname = "'" + lname + "'"
-    phone_number = str(request.form.get('phone_number'))
-    phone_number = "'" + phone_number + "'"
-    email = str(request.form.get('email'))
-    email = "'" + email + "'"
-    pwd = str(request.form.get('password'))
-    pwd = "'" + pwd + "'"
-
-    records = mysqlconnector.checkUserExists(email)
-    print(records)
-
-    if len(records) != 0:
-        print("Account with username already exists")
-        print(email)
-        return render_template('signup.html', info = email)
-    else:
-        # create account
-        mysqlconnector.createNewUser(fname, lname, phone_number, email, pwd)
-
-        # get newly created account details
-        account_detail = mysqlconnector.authorizeUser(email,pwd)
-
-        # set USER_ID
-        global USER_ID
-        USER_ID = account_detail[0][0]
-
-        # set USER_NAME
-        global USER_NAME
-        USER_NAME = account_detail[0][1]
-
-        mod_id = int(USER_ID)
-        records = mysqlconnector.displayWatchlist(mod_id)
-
-        # render user profild
-        return render_template('profile.html',name = USER_NAME, id_ = USER_ID, records = records)

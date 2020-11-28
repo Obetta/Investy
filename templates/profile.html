@@ -11,7 +11,7 @@
 
     <body>
         <div class="main">
-            <h1>Hello {{ name }} {{ id_ }}</h1>
+            <h1>Hello {{ name }}</h1>
             <br>
             <p>Investy</p>
             <form action="/search" method="POST" class="pure-form">
@@ -20,15 +20,20 @@
             </form>
             <p>The price of {{ company_name }}'s stock is: {{ stock_data }}</p>
             <br>
-            <a href="/insert_watchlist" ><button class="btn btn-primary">Add to stock watch-list</button></a>
+            <a href="/insert_watchlist"><button class="btn btn-primary">Add to stock watch-list</button></a>
             <br>
-            <a href="/delete_watchlist" ><button class="btn btn-primary">Delete from stock watch-list</button></a>
+            <a href="/delete_watchlist"><button class="btn btn-primary">Delete from stock watch-list</button></a>
             <br>
             <a href="/refresh"><button class="btn btn-primary">Refresh watch-list prices</button></a>
         </div>
-        <p>{{ name }}'s stock watch-list:</p>
-        {% for record in records %}
-            <p>Stock name: {{ record[0] }}, price: {{ record[1] }}</p>
-        {% endfor %}
+
+        <div>
+            <p>{{ name }}'s stock watch-list:</p>
+            {% for record in records %}
+                <p>Stock name: {{ record[0] }}, price: {{ record[1] }}</p>
+            {% endfor %}
+            <a href="/sign-out"><button class="btn btn-primary">Signout</button></a>
+        </div>
+        
     </body>
 </html>
