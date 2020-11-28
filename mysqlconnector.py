@@ -26,7 +26,7 @@ def displayWatchlist(userid_):
             print("MySQL connection is closed")
             return records
 
-def checkUserExists(email_, password):
+def authorizeUser(email_, password):
     try:
         connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
                                             database= 'Investy_Data',
@@ -48,27 +48,27 @@ def checkUserExists(email_, password):
             print("MySQL connection is closed")
             return records
 
-# def checkUserExists(email_,):
-#     try:
-#         connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
-#                                             database= 'Investy_Data',
-#                                             user='admin',
-#                                             password='asdfghjk')
+def checkUserExists(email_,):
+    try:
+        connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
+                                            database= 'Investy_Data',
+                                            user='admin',
+                                            password='asdfghjk')
         
-#         sql_select_Query = "SELECT * FROM USERS WHERE Email = {}".format(email_)
+        sql_select_Query = "SELECT * FROM USERS WHERE Email = {}".format(email_)
 
-#         cursor = connection.cursor()
-#         cursor.execute(sql_select_Query)
-#         records = cursor.fetchall()
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
 
-#     except mysql.connector.Error as error:
-#         print("Failed to execute stored procedure: {}".format(error))
-#     finally:
-#         if (connection.is_connected()):
-#             cursor.close()
-#             connection.close()
-#             print("MySQL connection is closed")
-#             return records
+    except mysql.connector.Error as error:
+        print("Failed to execute stored procedure: {}".format(error))
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+            print("MySQL connection is closed")
+            return records
 
 # can use this to search for a stock then return the price given the name
 def createNewUser(fname, lname, phone_number, email, password):

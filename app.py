@@ -1,113 +1,124 @@
 # !python3
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for, session
 import pymysql
 import mysqlconnector
 import price_update
+import secrets
 
 app = Flask(__name__)
+token = secrets.token_urlsafe(16)
+app.config["SECRET_KEY"] = token
 
 # GLOBAL VARIABLES
-USER_ID = ""
 CURR_STOCK = ""
-USER_NAME = ""
 
 @app.route('/')
 def homepage():
     return render_template("home.html")
 
-@app.route('/search', methods=['POST','GET'])
-def search():
-    unedited_company_name = str(request.form.get('company_name'))
-    company_name = "'" + unedited_company_name + "'"
-
-    stock_data = mysqlconnector.GetCompanyPrice(company_name)
-
-    mod_id = int(USER_ID)
-    records = mysqlconnector.displayWatchlist(mod_id)
-
-    global CURR_STOCK
-    CURR_STOCK = unedited_company_name
-
-    return render_template("profile.html", name = USER_NAME, id_ = USER_ID, company_name = unedited_company_name, stock_data = stock_data, records = records)
-
-@app.route('/insert_watchlist', methods=['POST','GET'])
-def insert_watchlist():
-    mod_id = int(USER_ID)
-    
-    mysqlconnector.callProcedureInsert(mod_id,CURR_STOCK)
-
-    records = mysqlconnector.displayWatchlist(USER_ID)
-
-    return render_template("profile.html", name = USER_NAME, id_ = USER_ID, records = records)
-
-@app.route('/delete_watchlist', methods=['POST','GET'])
-def delete_watchlist():
-    mod_id = int(USER_ID)
-
-    mysqlconnector.callProcedureDelete(mod_id,CURR_STOCK)
-    records = mysqlconnector.displayWatchlist(USER_ID)
-
-    return render_template("profile.html", name = USER_NAME, id_ = USER_ID, records = records)
-
-@app.route('/refresh', methods=['POST','GET'])
-def refresh():
-    mod_id = int(USER_ID)
-
-    records = mysqlconnector.displayWatchlist(USER_ID)
-    print(records)
-
-    for record in records:
-        print(record)
-        price_update.stockPriceUpdate(record[0])
-    
-    return render_template("profile.html", name = USER_NAME, id_ = USER_ID, records = records)
-
 @app.route('/login',methods=['POST','GET'])
 def login():
-    email = str(request.form.get('email'))
-    email = "'" + email + "'"
-    pwd = str(request.form.get('password'))
-    pwd = "'" + pwd + "'"
+    email_ = str(request.form.get('email'))
+    pwd_ = str(request.form.get('password'))
 
-    records = mysqlconnector.checkUserExists(email, pwd)
-    
-    if len(records) == 0 or records[0][1] == 'None':
+    email = "'" + email_ + "'"
+    pwd = "'" + pwd_ + "'"
+
+    records = mysqlconnector.authorizeUser(email, pwd)
+
+    if len(records) == 0 or email_ == 'None':
         print("invalid password or username")
         return render_template('login.html')
     else:
-        global USER_ID
-        USER_ID = records[0][0]
-        name = records[0][1]
+        session["USER_NAME"] = records[0][1]
+        session["USER_ID"] = records[0][0]
 
-        global USER_NAME
-        USER_NAME = name
-
-        mod_id = int(USER_ID)
-        records = mysqlconnector.displayWatchlist(mod_id)
-
-        return render_template('profile.html',name = USER_NAME, id_ = USER_ID, records = records)
-
+        if not session.get("USER_NAME") is None:
+            records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
+            return render_template('profile.html', name = session["USER_NAME"], records = records)
+        else:
+            print("No username found in session")
+            return redirect(url_for("login"))
+    
 @app.route('/signup',methods=['POST','GET'])
 def signup():
-    if len(request.form.get('fname')) > 0:
-        fname = "'" + str(request.form.get('fname')) + "'"
-        fname = "'" + fname + "'"
-        lname = "'" + str(request.form.get('lname')) + "'"
-        lname = "'" + lname + "'"
-        phone_number = "'" + str(request.form.get('phone_number')) + "'"
-        phone_number = "'" + phone_number + "'"
-        email = str(request.form.get('email'))
-        email = "'" + email + "'"
-        pwd = "'" + str(request.form.get('password')) + "'"
-        pwd = "'" + pwd + "'"
+    fname = str(request.form.get('fname'))
+    lname = str(request.form.get('lname'))
+    phone_number = str(request.form.get('phone_number'))
+    email = str(request.form.get('email'))
+    pwd = str(request.form.get('password'))
 
-        records = mysqlconnector.checkUserExists(email, pwd)
+    fname = "'" + fname + "'"
+    lname = "'" + lname + "'"
+    phone_number = "'" + phone_number + "'"
+    email = "'" + email + "'"
+    pwd = "'" + pwd + "'"
 
-        if temp == 0:
-            return render_template('profile.html',name = email)
-        else:
-            return render_template('profile.html',name = email)
+    records = mysqlconnector.checkUserExists(email)
+
+    if len(records) != 0 or email == 'None':
+        print("already esisting account")
+        return render_template('signup.html')
+    else:
+        mysqlconnector.createNewUser(fname, lname, phone_number, email, pwd)
+        records = mysqlconnector.authorizeUser(email, pwd)
+
+        session["USER_NAME"] = records[0][1]
+        session["USER_ID"] = records[0][0]
+
+        records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
+
+        return render_template('profile.html',name = session["USER_NAME"], records = records)
+
+@app.route('/search', methods=['POST','GET'])
+def search():
+    global CURR_STOCK
+    CURR_STOCK = str(request.form.get('company_name'))
+
+    query_company_name = "'" + CURR_STOCK + "'"
+
+    stock_data = mysqlconnector.GetCompanyPrice(query_company_name)
+
+    records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
+
+    return render_template("profile.html", name = session["USER_NAME"], company_name = CURR_STOCK, stock_data = stock_data, records = records)
+
+@app.route('/insert_watchlist', methods=['POST','GET'])
+def insert_watchlist():
+    mysqlconnector.callProcedureInsert(int(session["USER_ID"]),CURR_STOCK)
+
+    records = mysqlconnector.displayWatchlist(session["USER_ID"])
+
+    return render_template("profile.html", name = session["USER_NAME"], records = records)
+
+@app.route('/delete_watchlist', methods=['POST','GET'])
+def delete_watchlist():
+    mysqlconnector.callProcedureDelete(int(session["USER_ID"]),CURR_STOCK)
+
+    records = mysqlconnector.displayWatchlist(session["USER_ID"])
+
+    return render_template("profile.html", name = session["USER_NAME"], records = records)
+
+@app.route('/refresh', methods=['POST','GET'])
+def refresh():
+    records = mysqlconnector.displayWatchlist(session["USER_ID"])
+
+    for record in records:
+        price_update.stockPriceUpdate(record[0])
+    
+    return render_template("profile.html", name = session["USER_NAME"], records = records)
+
+@app.route("/sign-out")
+def sign_out():
+    global CURR_STOCK
+    CURR_STOCK = ""
+
+    session.pop("USER_NAME", None)
+    session.pop("USER_ID", None)
+    print(session)
+
+    return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.run()
