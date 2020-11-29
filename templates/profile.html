@@ -32,6 +32,8 @@
             {% for record in records %}
                 <p>Stock name: {{ record[0] }}, price: {{ record[1] }}</p>
             {% endfor %}
+            <hr>
+            <a href="/create_portfolio"><button class="btn btn-primary">Generate Portfolio</button></a>
             <a href="/sign-out"><button class="btn btn-primary">Signout</button></a>
         </div>
         
