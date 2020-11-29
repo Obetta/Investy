@@ -109,6 +109,19 @@ def refresh():
     
     return render_template("profile.html", name = session["USER_NAME"], records = records)
 
+@app.route('/create_portfolio', methods=['POST','GET'])
+def create_portfolio():
+    # records = mysqlconnector.displayWatchlist(session["USER_ID"])
+
+    # for record in records:
+    #     price_update.stockPriceUpdate(record[0])
+
+    # we get input from customer when they submit the form 
+    # we want to add the result to the portfolio table
+    # we want to store that info into an array and pass it back when rendering
+    
+    return render_template("portfolio.html", name = session["USER_NAME"])
+
 @app.route("/sign-out")
 def sign_out():
     global CURR_STOCK
