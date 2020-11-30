@@ -71,6 +71,11 @@ def signup():
 
         return render_template('profile.html',name = session["USER_NAME"], records = records)
 
+@app.route('/back',methods=['POST','GET'])
+def back():
+    records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
+    return render_template('profile.html', name = session["USER_NAME"], records = records)
+
 @app.route('/search', methods=['POST','GET'])
 def search():
     global CURR_STOCK
