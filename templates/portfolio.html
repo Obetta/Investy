@@ -15,18 +15,46 @@
             <br>
             <p>Investy</p>
             <form action="/create_portfolio" method="POST" class="pure-form">
-                <input class="form-control mr-sm-2" type="number" placeholder="Amount" name = "amount">
-                <input class="form-control mr-sm-2" type="number" placeholder="Years" name = "years">
+                <input class="form-control mr-sm-2" type="number" placeholder="Capital in USD($)" name = "amount">
+                <br>
+                <input class="form-control mr-sm-2" type="number" placeholder="Number of years" name = "years">
+                <hr>
                 <button type="submit" class="btn btn-primary" value="Submit">Generate portfolio</button>
             </form>
-            <hr>
         </div>
 
         <div>
+            <style type="text/css" media="screen">  
+                table {
+                    padding:2px;
+                    border-spacing:20px;
+                }
+
+                table td{
+                    border:1px solid black;
+                    text-align: center;
+                }
+            </style>
             <p>{{ name }}'s portfolios:</p>
-            <!-- {% for record in records %}
-                <p>Stock name: {{ record[0] }}, price: {{ record[1] }}</p>
-            {% endfor %} -->
+            <table>
+                <tr>
+                    <td><strong>Amount</strong></td>
+                    <td><strong>Years</strong></td>
+                    <td><strong>Low volatility stock</strong></td>
+                    <td><strong>Low stock amount</strong></td>
+                    <td><strong>Med volatility stock</strong></td>
+                    <td><strong>Med stock amount</strong></td>
+                    <td><strong>High volatility stock</strong></td>
+                    <td><strong>High stock amount</strong></td>
+                </tr>
+                {% for portfolio in records %}
+                    <tr>
+                    {% for cell in portfolio %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
             <hr>
             <a href="/sign-out"><button class="btn btn-primary">Signout</button></a>
         </div>

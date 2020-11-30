@@ -26,6 +26,28 @@ def displayWatchlist(userid_):
             print("MySQL connection is closed")
             return records
 
+def displayPortfolio(userid_):
+    try:
+        connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
+                                            database= 'Investy_Data',
+                                            user='admin',
+                                            password='asdfghjk')
+        
+        sql_select_Query = "select input_Amount,Year,LR_CompanyName,LR_Number_Stocks,MR_CompanyName,MR_Number_Stocks,HR_CompanyName,HR_Number_Stocks from Portfolio where userID = {}".format(userid_)
+
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query)
+        records = cursor.fetchall()
+
+    except mysql.connector.Error as error:
+        print("Failed to execute stored procedure: {}".format(error))
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+            print("MySQL connection is closed")
+            return records
+
 def authorizeUser(email_, password):
     try:
         connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
@@ -70,7 +92,6 @@ def checkUserExists(email_,):
             print("MySQL connection is closed")
             return records
 
-# can use this to search for a stock then return the price given the name
 def createNewUser(fname, lname, phone_number, email, password):
     try:
         connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
@@ -165,6 +186,24 @@ def updateallprices(name, price):
         print("Printing laptop details")
         for result in cursor.stored_results():
             print(result.fetchall())
+
+    except mysql.connector.Error as error:
+        print("Failed to execute stored procedure: {}".format(error))
+    finally:
+        if (connection.is_connected()):
+            cursor.close()
+            connection.close()
+            print("MySQL connection is closed")
+
+def callProcedurePortfolio(userid, amount, years, low_amount, mid_amount, high_amount, low, mid, high):
+    try:
+        connection = mysql.connector.connect(host='database-1.crilyi7ijefu.us-east-2.rds.amazonaws.com',
+                                            database= 'Investy_Data',
+                                            user='admin',
+                                            password='asdfghjk')
+        cursor = connection.cursor()
+        cursor.callproc('CreatePortfolio', [userid, amount, years, low_amount, mid_amount, high_amount, low, mid, high])
+        connection.commit()
 
     except mysql.connector.Error as error:
         print("Failed to execute stored procedure: {}".format(error))

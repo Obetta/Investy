@@ -25,7 +25,7 @@ def predict(amount, years):
             if (float(df['4close'][-1]) > amount):
                 continue
             month_count = np.array(list(range(df.shape[0]))).reshape(-1,1)
-            to_predict = np.array(list(range(month_count[-1][0], month_count[-1][0] + 12 * years))).reshape(-1,1)
+            to_predict = np.array(list(range(month_count[-1][0] + 1, month_count[-1][0] + 12 * years))).reshape(-1,1)
             model = LinearRegression()
             model.fit(month_count, df['4close'])
             result = model.predict(to_predict)
@@ -55,3 +55,5 @@ def predict(amount, years):
             stock_amount_2 = amount // price[final[1][0]]
             stock_amount_3 = amount // price[final[2][0]]
             return [final[0][0], stock_amount_1, final[1][0], stock_amount_2, final[2][0], stock_amount_3]
+
+# print(predict(50,2))

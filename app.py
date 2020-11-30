@@ -5,10 +5,10 @@ import pymysql
 import mysqlconnector
 import price_update
 import secrets
+import prediction
 
 app = Flask(__name__)
-token = secrets.token_urlsafe(16)
-app.config["SECRET_KEY"] = token
+app.config["SECRET_KEY"] = 'Drmhze6EPcv0fN_81Bj-nA'
 
 # GLOBAL VARIABLES
 CURR_STOCK = ""
@@ -111,16 +111,32 @@ def refresh():
 
 @app.route('/create_portfolio', methods=['POST','GET'])
 def create_portfolio():
-    # records = mysqlconnector.displayWatchlist(session["USER_ID"])
-
-    # for record in records:
-    #     price_update.stockPriceUpdate(record[0])
-
     # we get input from customer when they submit the form 
+    amount = request.form.get('amount')
+    years = request.form.get('years')
+
+    records = mysqlconnector.displayPortfolio(session["USER_ID"])
+
     # we want to add the result to the portfolio table
-    # we want to store that info into an array and pass it back when rendering
+    if amount == None and years == None:
+        return render_template("portfolio.html", name = session["USER_NAME"], records = records)
+
+    amount = int(amount)
+    years = int(years)
+
+    portfolio = prediction.predict(amount,years)
     
-    return render_template("portfolio.html", name = session["USER_NAME"])
+    if len(portfolio) == 2:
+        mysqlconnector.callProcedurePortfolio(int(session["USER_ID"]), amount, years, portfolio[1], None, None, portfolio[0], None, None)
+    elif len(portfolio) == 4:
+        mysqlconnector.callProcedurePortfolio(int(session["USER_ID"]), amount, years, portfolio[1], portfolio[3], None, portfolio[0], portfolio[2], None)
+    else:
+        mysqlconnector.callProcedurePortfolio(int(session["USER_ID"]), amount, years, portfolio[1], portfolio[3], portfolio[5], portfolio[0], portfolio[2], portfolio[4])
+
+    # we want to store that info into an array and pass it back when rendering
+    records = mysqlconnector.displayPortfolio(session["USER_ID"])
+
+    return render_template("portfolio.html", name = session["USER_NAME"], records = records)
 
 @app.route("/sign-out")
 def sign_out():
@@ -129,7 +145,7 @@ def sign_out():
 
     session.pop("USER_NAME", None)
     session.pop("USER_ID", None)
-    print(session)
+    print("session over")
 
     return redirect(url_for("login"))
 
