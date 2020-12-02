@@ -1,8 +1,8 @@
 flask
 mysql-connector
 pymysql
-secrets
 pandas
 pymongo
 sklearn
 numpy
+requests
