@@ -15,7 +15,7 @@ CURR_STOCK = ""
 
 @app.route('/')
 def homepage():
-    return render_template("home.html")
+    return render_template("index.html")
 
 @app.route('/login',methods=['POST','GET'])
 def login():
