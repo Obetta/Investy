@@ -55,5 +55,3 @@ def predict(amount, years):
             stock_amount_2 = amount // price[final[1][0]]
             stock_amount_3 = amount // price[final[2][0]]
             return [final[0][0], stock_amount_1, final[1][0], stock_amount_2, final[2][0], stock_amount_3]
-
-# print(predict(50,2))

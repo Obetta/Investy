@@ -25,18 +25,20 @@ def login():
     email = "'" + email_ + "'"
     pwd = "'" + pwd_ + "'"
 
+    error_info = 'None'
+
     records = mysqlconnector.authorizeUser(email, pwd)
 
     if len(records) == 0 or email_ == 'None':
-        print("invalid password or username")
-        return render_template('login.html')
+        if email_ != 'None':
+            error_info = 'invalid'
+        return render_template('login.html', error_info = error_info)
     else:
         session["USER_NAME"] = records[0][1]
         session["USER_ID"] = records[0][0]
 
         if not session.get("USER_NAME") is None:
-            records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
-            return render_template('profile.html', name = session["USER_NAME"], records = records)
+            return redirect(url_for("profile"))
         else:
             print("No username found in session")
             return redirect(url_for("login"))
@@ -46,20 +48,23 @@ def signup():
     fname = str(request.form.get('fname'))
     lname = str(request.form.get('lname'))
     phone_number = str(request.form.get('phone_number'))
-    email = str(request.form.get('email'))
+    email_ = str(request.form.get('email'))
     pwd = str(request.form.get('password'))
 
     fname = "'" + fname + "'"
     lname = "'" + lname + "'"
     phone_number = "'" + phone_number + "'"
-    email = "'" + email + "'"
+    email = "'" + email_ + "'"
     pwd = "'" + pwd + "'"
+
+    error_info = 'None'
 
     records = mysqlconnector.checkUserExists(email)
 
-    if len(records) != 0 or email == 'None':
-        print("already esisting account")
-        return render_template('signup.html')
+    if len(records) != 0 or email_ == 'None':
+        if email_ != 'None':
+            error_info = 'duplicate'
+        return render_template('signup.html', error_info = error_info)
     else:
         mysqlconnector.createNewUser(fname, lname, phone_number, email, pwd)
         records = mysqlconnector.authorizeUser(email, pwd)
@@ -67,12 +72,10 @@ def signup():
         session["USER_NAME"] = records[0][1]
         session["USER_ID"] = records[0][0]
 
-        records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
-
-        return render_template('profile.html',name = session["USER_NAME"], records = records)
-
-@app.route('/back',methods=['POST','GET'])
-def back():
+        return redirect(url_for("profile"))
+        
+@app.route('/profile',methods=['POST','GET'])
+def profile():
     records = mysqlconnector.displayWatchlist(int(session["USER_ID"]))
     return render_template('profile.html', name = session["USER_NAME"], records = records)
 
