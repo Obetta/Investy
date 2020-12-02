@@ -4,10 +4,15 @@
 
 .main {
     margin: 100px;
-    padding: 50px 100px;
+    padding: 100px 100px;
     text-align: center;
     width: 50%;
     font-size: 1rem;
     margin: auto;
-    background-color: #ecf5ff;
+    background-color: rgb(255, 255, 255);
+}
+
+.navbar-nav > li{
+    margin-left:5px;
+    margin-right:5px;
 }
