@@ -114,6 +114,8 @@ def refresh():
 
     for record in records:
         price_update.stockPriceUpdate(record[0])
+
+    records = mysqlconnector.displayWatchlist(session["USER_ID"])
     
     return render_template("profile.html", name = session["USER_NAME"], records = records)
 
